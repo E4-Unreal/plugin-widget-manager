@@ -30,8 +30,6 @@ protected:
     uint32 bShowMouseCursor:1;
 
 public:
-    virtual void BeginPlay() override;
-
     UFUNCTION(BlueprintPure)
     FORCEINLINE UUserWidget* GetOrCreateWidget(TSubclassOf<UUserWidget> WidgetClass);
 

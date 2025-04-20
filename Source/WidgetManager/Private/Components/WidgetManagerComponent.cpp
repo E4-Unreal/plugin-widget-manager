@@ -6,13 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "Logging.h"
 
-void UWidgetManagerComponent::BeginPlay()
-{
-    Super::BeginPlay();
-
-    GetWorld()->GetGameViewport()->SetMouseCaptureMode(EMouseCaptureMode::CapturePermanently);
-}
-
 UUserWidget* UWidgetManagerComponent::GetOrCreateWidget(TSubclassOf<UUserWidget> WidgetClass)
 {
     if (WidgetClass ==  nullptr) return nullptr;
@@ -292,11 +285,13 @@ void UWidgetManagerComponent::SetShowMouseCursor(bool bNewShowMouseCursor)
         bShowMouseCursor = true;
         OwningPlayerController->SetShowMouseCursor(true);
         OwningPlayerController->SetIgnoreLookInput(true);
+        OwningPlayerController->SetInputMode(FInputModeGameAndUI());
     }
     else if (!MainWidget && SubWidgets.IsEmpty())
     {
         bShowMouseCursor = false;
         OwningPlayerController->SetShowMouseCursor(false);
         OwningPlayerController->SetIgnoreLookInput(false);
+        OwningPlayerController->SetInputMode(FInputModeGameOnly());
     }
 }
