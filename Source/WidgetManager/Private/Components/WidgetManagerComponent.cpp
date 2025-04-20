@@ -13,6 +13,42 @@ UUserWidget* UWidgetManagerComponent::GetOrCreateWidget(TSubclassOf<UUserWidget>
     return WidgetMap.Contains(WidgetClass) ? WidgetMap[WidgetClass].Get() : RegisterWidget(WidgetClass);
 }
 
+void UWidgetManagerComponent::ShowMainWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+    if (!WidgetClass) return;
+
+    // Hide Old Main Widget
+    if (MainWidget) HideMainWidget(MainWidget);
+
+    // Show New Main Widget
+    MainWidget = WidgetClass;
+    ShowWidgetByClass(MainWidget);
+    SetShowMouseCursor(true);
+}
+
+void UWidgetManagerComponent::HideMainWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+    if (bool bCanHide = WidgetClass && MainWidget == WidgetClass; !bCanHide) return;
+
+    SetShowMouseCursor(false);
+    HideWidgetByClass(MainWidget);
+    MainWidget = nullptr;
+}
+
+void UWidgetManagerComponent::ToggleMainWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+    if (!WidgetClass) return;
+
+    if (IsInViewport(WidgetClass))
+    {
+        HideMainWidget(WidgetClass);
+    }
+    else
+    {
+        ShowMainWidget(WidgetClass);
+    }
+}
+
 bool UWidgetManagerComponent::ShowWidgetByClass(TSubclassOf<UUserWidget> WidgetClass)
 {
     if (UUserWidget* Widget = GetOrCreateWidget(WidgetClass))
@@ -58,56 +94,25 @@ bool UWidgetManagerComponent::HideWidgetByClass(TSubclassOf<UUserWidget> WidgetC
 
 void UWidgetManagerComponent::ToggleWidgetByClass(TSubclassOf<UUserWidget> WidgetClass)
 {
-    if (UUserWidget* Widget = GetOrCreateWidget(WidgetClass))
+    if (!WidgetClass) return;
+
+    if (IsInViewport(WidgetClass))
     {
-        if (Widget->IsInViewport())
-        {
-            HideWidgetByClass(WidgetClass);
-        }
-        else
-        {
-            ShowWidgetByClass(WidgetClass);
-        }
+        HideWidgetByClass(WidgetClass);
+    }
+    else
+    {
+        ShowWidgetByClass(WidgetClass);
     }
 }
 
-void UWidgetManagerComponent::ShowMainWidget(TSubclassOf<UUserWidget> WidgetClass)
+bool UWidgetManagerComponent::IsInViewport(TSubclassOf<UUserWidget> WidgetClass) const
 {
-    if (!WidgetClass) return;
+    if (!WidgetClass) return false;
 
-    // Hide Old Main Widget
-    if (MainWidget) HideMainWidget(MainWidget);
+    if (!WidgetMap.Contains(WidgetClass)) return false;
 
-    // Show New Main Widget
-    MainWidget = WidgetClass;
-    ShowWidgetByClass(MainWidget);
-    SetShowMouseCursor(true);
-}
-
-void UWidgetManagerComponent::HideMainWidget(TSubclassOf<UUserWidget> WidgetClass)
-{
-    if (bool bCanHide = WidgetClass && MainWidget == WidgetClass; !bCanHide) return;
-
-    SetShowMouseCursor(false);
-    HideWidgetByClass(MainWidget);
-    MainWidget = nullptr;
-}
-
-void UWidgetManagerComponent::ToggleMainWidget(TSubclassOf<UUserWidget> WidgetClass)
-{
-    if (!WidgetClass) return;
-
-    if (UUserWidget* Widget = GetOrCreateWidget(WidgetClass))
-    {
-        if (Widget->IsInViewport())
-        {
-            HideMainWidget(WidgetClass);
-        }
-        else
-        {
-            ShowMainWidget(WidgetClass);
-        }
-    }
+    return WidgetMap[WidgetClass]->IsInViewport();
 }
 
 APlayerController* UWidgetManagerComponent::GetPlayerController() const

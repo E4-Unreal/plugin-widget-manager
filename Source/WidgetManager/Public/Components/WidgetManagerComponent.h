@@ -33,13 +33,15 @@ public:
     FORCEINLINE UUserWidget* GetOrCreateWidget(TSubclassOf<UUserWidget> WidgetClass);
 
 protected:
+    virtual void ShowMainWidget(TSubclassOf<UUserWidget> WidgetClass);
+    virtual void HideMainWidget(TSubclassOf<UUserWidget> WidgetClass);
+    virtual void ToggleMainWidget(TSubclassOf<UUserWidget> WidgetClass);
+    
     virtual bool ShowWidgetByClass(TSubclassOf<UUserWidget> WidgetClass);
     virtual bool HideWidgetByClass(TSubclassOf<UUserWidget> WidgetClass);
     virtual void ToggleWidgetByClass(TSubclassOf<UUserWidget> WidgetClass);
 
-    virtual void ShowMainWidget(TSubclassOf<UUserWidget> WidgetClass);
-    virtual void HideMainWidget(TSubclassOf<UUserWidget> WidgetClass);
-    virtual void ToggleMainWidget(TSubclassOf<UUserWidget> WidgetClass);
+    virtual bool IsInViewport(TSubclassOf<UUserWidget> WidgetClass) const;
 
     UFUNCTION(BlueprintPure)
     APlayerController* GetPlayerController() const;
