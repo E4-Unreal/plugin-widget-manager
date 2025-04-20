@@ -15,7 +15,7 @@ UUserWidget* UWidgetManagerComponent::GetOrCreateWidget(TSubclassOf<UUserWidget>
 
 void UWidgetManagerComponent::ShowMainWidget(TSubclassOf<UUserWidget> WidgetClass)
 {
-    if (!WidgetClass) return;
+    if (!WidgetClass || IsInViewport(WidgetClass)) return;
 
     // Hide Old Main Widget
     if (MainWidget) HideMainWidget(MainWidget);
@@ -28,7 +28,7 @@ void UWidgetManagerComponent::ShowMainWidget(TSubclassOf<UUserWidget> WidgetClas
 
 void UWidgetManagerComponent::HideMainWidget(TSubclassOf<UUserWidget> WidgetClass)
 {
-    if (bool bCanHide = WidgetClass && MainWidget == WidgetClass; !bCanHide) return;
+    if (!WidgetClass || MainWidget != WidgetClass || !IsInViewport(WidgetClass)) return;
 
     SetShowMouseCursor(false);
     HideWidgetByClass(MainWidget);
@@ -46,6 +46,38 @@ void UWidgetManagerComponent::ToggleMainWidget(TSubclassOf<UUserWidget> WidgetCl
     else
     {
         ShowMainWidget(WidgetClass);
+    }
+}
+
+void UWidgetManagerComponent::ShowSubWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+    if (!WidgetClass || IsInViewport(WidgetClass)) return;
+
+    SubWidgets.Emplace(WidgetClass);
+    ShowWidgetByClass(WidgetClass);
+    SetShowMouseCursor(true);
+}
+
+void UWidgetManagerComponent::HideSubWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+    if (!WidgetClass || !IsInViewport(WidgetClass)) return;
+
+    SetShowMouseCursor(false);
+    HideWidgetByClass(WidgetClass);
+    SubWidgets.RemoveSingle(WidgetClass);
+}
+
+void UWidgetManagerComponent::ToggleSubWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+    if (!WidgetClass) return;
+
+    if (IsInViewport(WidgetClass))
+    {
+        HideSubWidget(WidgetClass);
+    }
+    else
+    {
+        ShowSubWidget(WidgetClass);
     }
 }
 
@@ -108,8 +140,6 @@ void UWidgetManagerComponent::ToggleWidgetByClass(TSubclassOf<UUserWidget> Widge
 
 bool UWidgetManagerComponent::IsInViewport(TSubclassOf<UUserWidget> WidgetClass) const
 {
-    if (!WidgetClass) return false;
-
     if (!WidgetMap.Contains(WidgetClass)) return false;
 
     return WidgetMap[WidgetClass]->IsInViewport();
