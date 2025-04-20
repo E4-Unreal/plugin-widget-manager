@@ -265,6 +265,9 @@ void UWidgetManagerComponent::SetShowMouseCursor(bool bNewShowMouseCursor)
     auto OwningPlayerController = GetPlayerController();
     if (bNewShowMouseCursor)
     {
+        int32 SizeX, SizeY;
+        OwningPlayerController->GetViewportSize(SizeX, SizeY);
+        OwningPlayerController->SetMouseLocation(SizeX / 2, SizeY / 2);
         bShowMouseCursor = true;
         OwningPlayerController->SetShowMouseCursor(true);
         OwningPlayerController->SetIgnoreLookInput(true);
