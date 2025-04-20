@@ -6,6 +6,13 @@
 #include "Blueprint/UserWidget.h"
 #include "Logging.h"
 
+void UWidgetManagerComponent::BeginPlay()
+{
+    Super::BeginPlay();
+
+    GetWorld()->GetGameViewport()->SetMouseCaptureMode(EMouseCaptureMode::CapturePermanently);
+}
+
 UUserWidget* UWidgetManagerComponent::GetOrCreateWidget(TSubclassOf<UUserWidget> WidgetClass)
 {
     if (WidgetClass ==  nullptr) return nullptr;
