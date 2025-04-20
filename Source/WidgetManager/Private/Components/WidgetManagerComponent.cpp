@@ -84,9 +84,9 @@ void UWidgetManagerComponent::HideMainWidget(TSubclassOf<UUserWidget> WidgetClas
 {
     if (!WidgetClass || MainWidget != WidgetClass || !IsInViewport(WidgetClass)) return;
 
-    SetShowMouseCursor(false);
-    HideWidgetByClass(MainWidget);
     MainWidget = nullptr;
+    HideWidgetByClass(MainWidget);
+    SetShowMouseCursor(false);
 }
 
 void UWidgetManagerComponent::ToggleMainWidget(TSubclassOf<UUserWidget> WidgetClass)
@@ -116,9 +116,9 @@ void UWidgetManagerComponent::HideSubWidget(TSubclassOf<UUserWidget> WidgetClass
 {
     if (!WidgetClass || !IsInViewport(WidgetClass)) return;
 
-    SetShowMouseCursor(false);
-    HideWidgetByClass(WidgetClass);
     SubWidgets.RemoveSingle(WidgetClass);
+    HideWidgetByClass(WidgetClass);
+    SetShowMouseCursor(false);
 }
 
 void UWidgetManagerComponent::ToggleSubWidget(TSubclassOf<UUserWidget> WidgetClass)
