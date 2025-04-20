@@ -84,6 +84,7 @@ void UWidgetManagerComponent::ShowMainWidget(TSubclassOf<UUserWidget> WidgetClas
     // Show New Main Widget
     MainWidget = WidgetClass;
     ShowWidgetByClass(MainWidget);
+
     SetShowMouseCursor(true);
 }
 
@@ -91,8 +92,9 @@ void UWidgetManagerComponent::HideMainWidget(TSubclassOf<UUserWidget> WidgetClas
 {
     if (!WidgetClass || MainWidget != WidgetClass || !IsInViewport(WidgetClass)) return;
 
-    MainWidget = nullptr;
     HideWidgetByClass(MainWidget);
+    MainWidget = nullptr;
+
     SetShowMouseCursor(false);
 }
 
