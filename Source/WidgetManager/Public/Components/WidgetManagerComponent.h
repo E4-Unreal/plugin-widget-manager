@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Types/WidgetType.h"
 #include "WidgetManagerComponent.generated.h"
 
 /**
@@ -31,6 +32,15 @@ protected:
 public:
     UFUNCTION(BlueprintPure)
     FORCEINLINE UUserWidget* GetOrCreateWidget(TSubclassOf<UUserWidget> WidgetClass);
+
+    UFUNCTION(BlueprintCallable)
+    virtual void ShowWidget(TSubclassOf<UUserWidget> WidgetClass, EWidgetType WidgetType = EWidgetType::HUD);
+
+    UFUNCTION(BlueprintCallable)
+    virtual void HideWidget(TSubclassOf<UUserWidget> WidgetClass, EWidgetType WidgetType = EWidgetType::HUD);
+
+    UFUNCTION(BlueprintCallable)
+    virtual void ToggleWidget(TSubclassOf<UUserWidget> WidgetClass, EWidgetType WidgetType = EWidgetType::HUD);
 
 protected:
     virtual void ShowMainWidget(TSubclassOf<UUserWidget> WidgetClass);

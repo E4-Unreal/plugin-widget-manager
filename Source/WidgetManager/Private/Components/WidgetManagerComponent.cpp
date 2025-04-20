@@ -13,6 +13,60 @@ UUserWidget* UWidgetManagerComponent::GetOrCreateWidget(TSubclassOf<UUserWidget>
     return WidgetMap.Contains(WidgetClass) ? WidgetMap[WidgetClass].Get() : RegisterWidget(WidgetClass);
 }
 
+void UWidgetManagerComponent::ShowWidget(TSubclassOf<UUserWidget> WidgetClass, EWidgetType WidgetType)
+{
+    if (!WidgetClass) return;
+
+    switch (WidgetType)
+    {
+    case EWidgetType::HUD:
+        ShowWidgetByClass(WidgetClass);
+        break;
+    case EWidgetType::Main:
+        ShowMainWidget(WidgetClass);
+        break;
+    case EWidgetType::Sub:
+        ShowSubWidget(WidgetClass);
+        break;
+    }
+}
+
+void UWidgetManagerComponent::HideWidget(TSubclassOf<UUserWidget> WidgetClass, EWidgetType WidgetType)
+{
+    if (!WidgetClass) return;
+
+    switch (WidgetType)
+    {
+    case EWidgetType::HUD:
+        HideWidgetByClass(WidgetClass);
+        break;
+    case EWidgetType::Main:
+        HideMainWidget(WidgetClass);
+        break;
+    case EWidgetType::Sub:
+        HideSubWidget(WidgetClass);
+        break;
+    }
+}
+
+void UWidgetManagerComponent::ToggleWidget(TSubclassOf<UUserWidget> WidgetClass, EWidgetType WidgetType)
+{
+    if (!WidgetClass) return;
+
+    switch (WidgetType)
+    {
+    case EWidgetType::HUD:
+        ToggleWidgetByClass(WidgetClass);
+        break;
+    case EWidgetType::Main:
+        ToggleMainWidget(WidgetClass);
+        break;
+    case EWidgetType::Sub:
+        ToggleSubWidget(WidgetClass);
+        break;
+    }
+}
+
 void UWidgetManagerComponent::ShowMainWidget(TSubclassOf<UUserWidget> WidgetClass)
 {
     if (!WidgetClass || IsInViewport(WidgetClass)) return;
