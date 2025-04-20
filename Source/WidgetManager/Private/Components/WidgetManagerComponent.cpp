@@ -78,6 +78,12 @@ void UWidgetManagerComponent::ShowMainWidget(TSubclassOf<UUserWidget> WidgetClas
 {
     if (!WidgetClass || IsInViewport(WidgetClass)) return;
 
+    // Hide All Sub Widgets
+    for (auto SubWidget : SubWidgets)
+    {
+        HideSubWidget(SubWidget);
+    }
+
     // Hide Old Main Widget
     if (MainWidget) HideMainWidget(MainWidget);
 
