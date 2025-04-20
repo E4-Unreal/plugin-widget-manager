@@ -78,27 +78,30 @@ void UWidgetManagerComponent::ShowMainWidget(TSubclassOf<UUserWidget> WidgetClas
 {
     if (!WidgetClass || IsInViewport(WidgetClass)) return;
 
+    auto OldMainWidget = MainWidget;
+    auto NewMainWidget = WidgetClass;
+
+    // Show New Main Widget
+    MainWidget = NewMainWidget;
+    ShowWidgetByClass(NewMainWidget);
+    SetShowMouseCursor(true);
+
+    // Hide Old Main Widget
+    HideMainWidget(OldMainWidget);
+
     // Hide All Sub Widgets
     for (int32 Index = SubWidgets.Num() - 1; Index >= 0; --Index)
     {
         HideSubWidget(SubWidgets[Index]);
     }
-
-    // Hide Old Main Widget
-    if (MainWidget) HideMainWidget(MainWidget);
-
-    // Show New Main Widget
-    MainWidget = WidgetClass;
-    ShowWidgetByClass(MainWidget);
-
-    SetShowMouseCursor(true);
 }
 
 void UWidgetManagerComponent::HideMainWidget(TSubclassOf<UUserWidget> WidgetClass)
 {
     if (!WidgetClass || MainWidget != WidgetClass || !IsInViewport(WidgetClass)) return;
 
-    HideWidgetByClass(MainWidget);
+    auto OldMainWidget = MainWidget;
+    HideWidgetByClass(OldMainWidget);
     MainWidget = nullptr;
 
     SetShowMouseCursor(false);
