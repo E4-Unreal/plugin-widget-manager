@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CommonInputModeTypes.h"
 #include "Components/ActorComponent.h"
 #include "Types/WidgetType.h"
 #include "WidgetManagerComponent.generated.h"
@@ -27,7 +28,7 @@ protected:
     TArray<TSubclassOf<UUserWidget>> SubWidgets;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = "State")
-    uint32 bShowMouseCursor:1;
+    ECommonInputMode InputMode = ECommonInputMode::Game;
 
 public:
     UFUNCTION(BlueprintPure)
@@ -57,6 +58,11 @@ protected:
 
     virtual bool IsInViewport(TSubclassOf<UUserWidget> WidgetClass) const;
 
+    virtual void SetInputMode(ECommonInputMode NewInputMode);
+    virtual void HideSubWidgets();
+    virtual void SetMouseLocationToCenter();
+    virtual void SetMainWidget(TSubclassOf<UUserWidget> WidgetClass);
+
     UFUNCTION(BlueprintPure)
     APlayerController* GetPlayerController() const;
 
@@ -65,6 +71,4 @@ protected:
 
     UFUNCTION(BlueprintCallable)
     virtual void UnRegisterWidget(TSubclassOf<UUserWidget> WidgetClass);
-
-    virtual void SetShowMouseCursor(bool bNewShowMouseCursor);
 };

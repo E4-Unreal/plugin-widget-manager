@@ -69,35 +69,16 @@ void UWidgetManagerComponent::ToggleWidget(TSubclassOf<UUserWidget> WidgetClass,
 
 void UWidgetManagerComponent::ShowMainWidget(TSubclassOf<UUserWidget> WidgetClass)
 {
-    if (!WidgetClass || IsInViewport(WidgetClass)) return;
+    if (!WidgetClass) return;
 
-    auto OldMainWidget = MainWidget;
-    auto NewMainWidget = WidgetClass;
-
-    // Show New Main Widget
-    MainWidget = NewMainWidget;
-    ShowWidgetByClass(NewMainWidget);
-    SetShowMouseCursor(true);
-
-    // Hide Old Main Widget
-    HideMainWidget(OldMainWidget);
-
-    // Hide All Sub Widgets
-    for (int32 Index = SubWidgets.Num() - 1; Index >= 0; --Index)
-    {
-        HideSubWidget(SubWidgets[Index]);
-    }
+    SetMainWidget(WidgetClass);
 }
 
 void UWidgetManagerComponent::HideMainWidget(TSubclassOf<UUserWidget> WidgetClass)
 {
-    if (!WidgetClass || MainWidget != WidgetClass || !IsInViewport(WidgetClass)) return;
+    if (!WidgetClass || MainWidget != WidgetClass) return;
 
-    auto OldMainWidget = MainWidget;
-    HideWidgetByClass(OldMainWidget);
-    MainWidget = nullptr;
-
-    SetShowMouseCursor(false);
+    SetMainWidget(nullptr);
 }
 
 void UWidgetManagerComponent::ToggleMainWidget(TSubclassOf<UUserWidget> WidgetClass)
@@ -119,11 +100,11 @@ void UWidgetManagerComponent::ShowSubWidget(TSubclassOf<UUserWidget> WidgetClass
     if (!WidgetClass || IsInViewport(WidgetClass)) return;
 
     // 메인 위젯이 표시되고 있는 동안에는 서브 위젯을 표시할 수 없습니다.
-    if (MainWidget) return;
+    if (InputMode == ECommonInputMode::Menu) return;
 
     SubWidgets.Emplace(WidgetClass);
     ShowWidgetByClass(WidgetClass);
-    SetShowMouseCursor(true);
+    SetInputMode(ECommonInputMode::All);
 }
 
 void UWidgetManagerComponent::HideSubWidget(TSubclassOf<UUserWidget> WidgetClass)
@@ -132,7 +113,7 @@ void UWidgetManagerComponent::HideSubWidget(TSubclassOf<UUserWidget> WidgetClass
 
     SubWidgets.RemoveSingle(WidgetClass);
     HideWidgetByClass(WidgetClass);
-    SetShowMouseCursor(false);
+    if (SubWidgets.IsEmpty() && InputMode == ECommonInputMode::All) SetInputMode(ECommonInputMode::Game);
 }
 
 void UWidgetManagerComponent::ToggleSubWidget(TSubclassOf<UUserWidget> WidgetClass)
@@ -213,6 +194,106 @@ bool UWidgetManagerComponent::IsInViewport(TSubclassOf<UUserWidget> WidgetClass)
     return WidgetMap[WidgetClass]->IsInViewport();
 }
 
+void UWidgetManagerComponent::SetInputMode(ECommonInputMode NewInputMode)
+{
+    if (InputMode == NewInputMode) return;
+    auto OldInputMode = InputMode;
+    InputMode = NewInputMode;
+
+    auto OwningPlayerController = GetPlayerController();
+
+    switch (NewInputMode)
+    {
+    case ECommonInputMode::Game:
+        // Set InputMode
+        OwningPlayerController->SetInputMode(FInputModeGameOnly());
+
+        // Hide Mouse Cursor
+        OwningPlayerController->SetShowMouseCursor(false);
+        OwningPlayerController->SetIgnoreLookInput(false);
+
+        break;
+    case ECommonInputMode::All:
+        {
+            // Set InputMode
+            FInputModeGameAndUI InputModeGameAndUI;
+            InputModeGameAndUI.SetHideCursorDuringCapture(false);
+            OwningPlayerController->SetInputMode(InputModeGameAndUI);
+        }
+
+        // Show Mouse Cursor
+        if (OldInputMode == ECommonInputMode::Game)
+        {
+            SetMouseLocationToCenter();
+            OwningPlayerController->SetShowMouseCursor(true);
+            OwningPlayerController->SetIgnoreLookInput(true);
+        }
+
+        break;
+    case ECommonInputMode::Menu:
+        // Set InputMode
+        OwningPlayerController->SetInputMode(FInputModeUIOnly());
+        OwningPlayerController->FlushPressedKeys();
+
+        // Show Mouse Cursor
+        if (OldInputMode == ECommonInputMode::Game)
+        {
+            SetMouseLocationToCenter();
+            OwningPlayerController->SetShowMouseCursor(true);
+            OwningPlayerController->SetIgnoreLookInput(true);
+        }
+
+        // Hide All Sub Widgets
+        HideSubWidgets();
+
+        break;
+    case ECommonInputMode::MAX:
+        break;
+    }
+}
+
+void UWidgetManagerComponent::HideSubWidgets()
+{
+    for (int32 Index = SubWidgets.Num() - 1; Index >= 0; --Index)
+    {
+        HideSubWidget(SubWidgets[Index]);
+    }
+}
+
+void UWidgetManagerComponent::SetMouseLocationToCenter()
+{
+    auto OwningPlayerController = GetPlayerController();
+
+    int32 SizeX, SizeY;
+    OwningPlayerController->GetViewportSize(SizeX, SizeY);
+    OwningPlayerController->SetMouseLocation(SizeX / 2, SizeY / 2);
+}
+
+void UWidgetManagerComponent::SetMainWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+    if (MainWidget == WidgetClass) return;
+    auto OldMainWidget = MainWidget;
+    auto NewMainWidget = WidgetClass;
+    MainWidget = NewMainWidget;
+
+    // Hide Old Main Widget
+    if (OldMainWidget)
+    {
+        HideWidgetByClass(OldMainWidget);
+    }
+
+    // Show Old Main Widget
+    if (NewMainWidget)
+    {
+        ShowWidgetByClass(NewMainWidget);
+        SetInputMode(ECommonInputMode::Menu);
+    }
+    else
+    {
+        SetInputMode(ECommonInputMode::Game);
+    }
+}
+
 APlayerController* UWidgetManagerComponent::GetPlayerController() const
 {
     UClass* OwnerClass = GetOwner()->GetClass();
@@ -270,30 +351,4 @@ void UWidgetManagerComponent::UnRegisterWidget(TSubclassOf<UUserWidget> WidgetCl
     WidgetMap.Remove(WidgetClass);
 
     LOG_ACTOR_COMPONENT(Log, TEXT("%s is unregistered"), *WidgetClass->GetName())
-}
-
-void UWidgetManagerComponent::SetShowMouseCursor(bool bNewShowMouseCursor)
-{
-    if (bShowMouseCursor == bNewShowMouseCursor) return;
-
-    auto OwningPlayerController = GetPlayerController();
-    if (bNewShowMouseCursor)
-    {
-        int32 SizeX, SizeY;
-        OwningPlayerController->GetViewportSize(SizeX, SizeY);
-        OwningPlayerController->SetMouseLocation(SizeX / 2, SizeY / 2);
-        bShowMouseCursor = true;
-        OwningPlayerController->SetShowMouseCursor(true);
-        OwningPlayerController->SetIgnoreLookInput(true);
-        FInputModeGameAndUI InputMode;
-        InputMode.SetHideCursorDuringCapture(false);
-        OwningPlayerController->SetInputMode(InputMode);
-    }
-    else if (!MainWidget && SubWidgets.IsEmpty())
-    {
-        bShowMouseCursor = false;
-        OwningPlayerController->SetShowMouseCursor(false);
-        OwningPlayerController->SetIgnoreLookInput(false);
-        OwningPlayerController->SetInputMode(FInputModeGameOnly());
-    }
 }
