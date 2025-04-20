@@ -13,7 +13,7 @@ UUserWidget* UWidgetManagerComponent::GetOrCreateWidget(TSubclassOf<UUserWidget>
     return WidgetMap.Contains(WidgetClass) ? WidgetMap[WidgetClass].Get() : RegisterWidget(WidgetClass);
 }
 
-void UWidgetManagerComponent::ShowWidget(TSubclassOf<UUserWidget> WidgetClass)
+bool UWidgetManagerComponent::ShowWidgetByClass(TSubclassOf<UUserWidget> WidgetClass)
 {
     if (UUserWidget* Widget = GetOrCreateWidget(WidgetClass))
     {
@@ -23,14 +23,18 @@ void UWidgetManagerComponent::ShowWidget(TSubclassOf<UUserWidget> WidgetClass)
         }
         else
         {
+            LOG_ACTOR_COMPONENT(Log, TEXT("%s is added to viewport."), *WidgetClass->GetName())
+
             Widget->AddToViewport();
 
-            LOG_ACTOR_COMPONENT(Log, TEXT("%s is added to viewport."), *WidgetClass->GetName())
+            return true;
         }
     }
+
+    return false;
 }
 
-void UWidgetManagerComponent::HideWidget(TSubclassOf<UUserWidget> WidgetClass)
+bool UWidgetManagerComponent::HideWidgetByClass(TSubclassOf<UUserWidget> WidgetClass)
 {
     // 위젯 비활성화
     if (UUserWidget* Widget = GetOrCreateWidget(WidgetClass))
@@ -41,24 +45,28 @@ void UWidgetManagerComponent::HideWidget(TSubclassOf<UUserWidget> WidgetClass)
         }
         else
         {
+            LOG_ACTOR_COMPONENT(Log, TEXT("%s is removed from viewport."), *WidgetClass->GetName())
+
             Widget->RemoveFromParent();
 
-            LOG_ACTOR_COMPONENT(Log, TEXT("%s is removed from viewport."), *WidgetClass->GetName())
+            return true;
         }
     }
+
+    return false;
 }
 
-void UWidgetManagerComponent::ToggleWidget(TSubclassOf<UUserWidget> WidgetClass)
+void UWidgetManagerComponent::ToggleWidgetByClass(TSubclassOf<UUserWidget> WidgetClass)
 {
     if (UUserWidget* Widget = GetOrCreateWidget(WidgetClass))
     {
         if (Widget->IsInViewport())
         {
-            HideWidget(WidgetClass);
+            HideWidgetByClass(WidgetClass);
         }
         else
         {
-            ShowWidget(WidgetClass);
+            ShowWidgetByClass(WidgetClass);
         }
     }
 }
@@ -116,7 +124,7 @@ void UWidgetManagerComponent::UnRegisterWidget(TSubclassOf<UUserWidget> WidgetCl
     }
 
     // 위젯 파괴 및 등록 해제
-    HideWidget(WidgetClass);
+    HideWidgetByClass(WidgetClass);
     WidgetMap.Remove(WidgetClass);
 
     LOG_ACTOR_COMPONENT(Log, TEXT("%s is unregistered"), *WidgetClass->GetName())
