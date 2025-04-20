@@ -19,6 +19,15 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = "State")
     TMap<TSubclassOf<UUserWidget>, TObjectPtr<UUserWidget>> WidgetMap;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = "State")
+    TObjectPtr<UUserWidget> MainWidget;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = "State")
+    TArray<TSubclassOf<UUserWidget>> SubWidgets;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = "State")
+    uint32 bShowMouseCursor:1;
+
 public:
     UFUNCTION(BlueprintPure)
     FORCEINLINE UUserWidget* GetOrCreateWidget(TSubclassOf<UUserWidget> WidgetClass);
@@ -41,4 +50,6 @@ protected:
 
     UFUNCTION(BlueprintCallable)
     virtual void UnRegisterWidget(TSubclassOf<UUserWidget> WidgetClass);
+
+    virtual void SetShowMouseCursor(bool bNewShowMouseCursor);
 };

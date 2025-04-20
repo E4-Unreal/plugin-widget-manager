@@ -121,3 +121,22 @@ void UWidgetManagerComponent::UnRegisterWidget(TSubclassOf<UUserWidget> WidgetCl
 
     LOG_ACTOR_COMPONENT(Log, TEXT("%s is unregistered"), *WidgetClass->GetName())
 }
+
+void UWidgetManagerComponent::SetShowMouseCursor(bool bNewShowMouseCursor)
+{
+    if (bShowMouseCursor == bNewShowMouseCursor) return;
+
+    auto OwningPlayerController = GetPlayerController();
+    if (bNewShowMouseCursor)
+    {
+        bShowMouseCursor = true;
+        OwningPlayerController->SetShowMouseCursor(true);
+        OwningPlayerController->SetIgnoreLookInput(true);
+    }
+    else if (!MainWidget && SubWidgets.IsEmpty())
+    {
+        bShowMouseCursor = false;
+        OwningPlayerController->SetShowMouseCursor(false);
+        OwningPlayerController->SetIgnoreLookInput(false);
+    }
+}
