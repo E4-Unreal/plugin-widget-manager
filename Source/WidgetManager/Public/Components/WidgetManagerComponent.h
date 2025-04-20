@@ -20,7 +20,7 @@ protected:
     TMap<TSubclassOf<UUserWidget>, TObjectPtr<UUserWidget>> WidgetMap;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = "State")
-    TObjectPtr<UUserWidget> MainWidget;
+    TSubclassOf<UUserWidget> MainWidget;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category = "State")
     TArray<TSubclassOf<UUserWidget>> SubWidgets;
@@ -36,6 +36,10 @@ protected:
     virtual bool ShowWidgetByClass(TSubclassOf<UUserWidget> WidgetClass);
     virtual bool HideWidgetByClass(TSubclassOf<UUserWidget> WidgetClass);
     virtual void ToggleWidgetByClass(TSubclassOf<UUserWidget> WidgetClass);
+
+    virtual void ShowMainWidget(TSubclassOf<UUserWidget> WidgetClass);
+    virtual void HideMainWidget(TSubclassOf<UUserWidget> WidgetClass);
+    virtual void ToggleMainWidget(TSubclassOf<UUserWidget> WidgetClass);
 
     UFUNCTION(BlueprintPure)
     APlayerController* GetPlayerController() const;

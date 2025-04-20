@@ -71,6 +71,45 @@ void UWidgetManagerComponent::ToggleWidgetByClass(TSubclassOf<UUserWidget> Widge
     }
 }
 
+void UWidgetManagerComponent::ShowMainWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+    if (!WidgetClass) return;
+
+    // Hide Old Main Widget
+    if (MainWidget) HideMainWidget(MainWidget);
+
+    // Show New Main Widget
+    MainWidget = WidgetClass;
+    ShowWidgetByClass(MainWidget);
+    SetShowMouseCursor(true);
+}
+
+void UWidgetManagerComponent::HideMainWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+    if (bool bCanHide = WidgetClass && MainWidget == WidgetClass; !bCanHide) return;
+
+    SetShowMouseCursor(false);
+    HideWidgetByClass(MainWidget);
+    MainWidget = nullptr;
+}
+
+void UWidgetManagerComponent::ToggleMainWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+    if (!WidgetClass) return;
+
+    if (UUserWidget* Widget = GetOrCreateWidget(WidgetClass))
+    {
+        if (Widget->IsInViewport())
+        {
+            HideMainWidget(WidgetClass);
+        }
+        else
+        {
+            ShowMainWidget(WidgetClass);
+        }
+    }
+}
+
 APlayerController* UWidgetManagerComponent::GetPlayerController() const
 {
     UClass* OwnerClass = GetOwner()->GetClass();
