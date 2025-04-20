@@ -79,9 +79,9 @@ void UWidgetManagerComponent::ShowMainWidget(TSubclassOf<UUserWidget> WidgetClas
     if (!WidgetClass || IsInViewport(WidgetClass)) return;
 
     // Hide All Sub Widgets
-    for (auto SubWidget : SubWidgets)
+    for (int32 Index = SubWidgets.Num() - 1; Index >= 0; --Index)
     {
-        HideSubWidget(SubWidget);
+        HideSubWidget(SubWidgets[Index]);
     }
 
     // Hide Old Main Widget
@@ -121,6 +121,9 @@ void UWidgetManagerComponent::ToggleMainWidget(TSubclassOf<UUserWidget> WidgetCl
 void UWidgetManagerComponent::ShowSubWidget(TSubclassOf<UUserWidget> WidgetClass)
 {
     if (!WidgetClass || IsInViewport(WidgetClass)) return;
+
+    // 메인 위젯이 표시되고 있는 동안에는 서브 위젯을 표시할 수 없습니다.
+    if (MainWidget) return;
 
     SubWidgets.Emplace(WidgetClass);
     ShowWidgetByClass(WidgetClass);
