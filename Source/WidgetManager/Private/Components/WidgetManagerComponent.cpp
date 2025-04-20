@@ -285,7 +285,9 @@ void UWidgetManagerComponent::SetShowMouseCursor(bool bNewShowMouseCursor)
         bShowMouseCursor = true;
         OwningPlayerController->SetShowMouseCursor(true);
         OwningPlayerController->SetIgnoreLookInput(true);
-        OwningPlayerController->SetInputMode(FInputModeGameAndUI());
+        FInputModeGameAndUI InputMode;
+        InputMode.SetHideCursorDuringCapture(false);
+        OwningPlayerController->SetInputMode(InputMode);
     }
     else if (!MainWidget && SubWidgets.IsEmpty())
     {
