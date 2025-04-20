@@ -1,0 +1,30 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1.0",
+	"FriendlyName": "WidgetManager",
+	"Description": "Widget manager system with pooling",
+	"Category": "UI",
+	"CreatedBy": "Eu4ng",
+	"CreatedByURL": "https://github.com/Eu4ng",
+	"DocsURL": "https://github.com/E4-Unreal/plugin-widget-manager/wiki",
+	"MarketplaceURL": "",
+	"SupportURL": "https://github.com/E4-Unreal/plugin-widget-manager",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": true,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "WidgetManager",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+    "Plugins": [
+        {
+            "Name": "UniversalUtilities",
+            "Enabled": true
+        }
+    ]
+}
