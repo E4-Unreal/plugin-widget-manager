@@ -12,6 +12,8 @@ public class WidgetManager : ModuleRules
                 "Core",
                 "UMG",
                 "UniversalUtilities",
+                "EnhancedInputBinder",
+                "EnhancedInput"
             }
         );
 
