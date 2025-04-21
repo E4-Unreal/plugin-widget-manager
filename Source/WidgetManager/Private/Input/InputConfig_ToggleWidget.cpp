@@ -5,12 +5,10 @@
 
 #include "Components/WidgetManagerComponent.h"
 
-void UInputConfig_ToggleWidget::OnTriggered_Implementation(APawn* Pawn, APlayerController* PlayerController,
-                                                           const FInputActionValue& InputActionValue)
+void UInputConfig_ToggleWidget::OnTriggered_Implementation(APlayerController* PlayerController, const FInputActionInstance& InputActionInstance)
 {
-    Super::OnTriggered_Implementation(Pawn, PlayerController, InputActionValue);
+    Super::OnTriggered_Implementation(PlayerController, InputActionInstance);
 
-    auto Target = bPlayerController ? Cast<AActor>(PlayerController) : Cast<AActor>(Pawn);
-    auto WidgetManagerComponent = Target->GetComponentByClass<UWidgetManagerComponent>();
+    auto WidgetManagerComponent = bPlayerController ? PlayerController->GetComponentByClass<UWidgetManagerComponent>() : PlayerController->GetPawn()->GetComponentByClass<UWidgetManagerComponent>();
     if (WidgetManagerComponent) WidgetManagerComponent->ToggleWidget(WidgetClass, WidgetType);
 }
