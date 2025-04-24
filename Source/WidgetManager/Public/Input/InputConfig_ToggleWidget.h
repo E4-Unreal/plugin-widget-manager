@@ -3,28 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Input/InputConfig.h"
-#include "Types/WidgetType.h"
+#include "Input/InputConfigBase.h"
 #include "InputConfig_ToggleWidget.generated.h"
+
+class UInputAction;
+class UUserWidget;
 
 /**
  *
  */
 UCLASS()
-class WIDGETMANAGER_API UInputConfig_ToggleWidget : public UInputConfig
+class WIDGETMANAGER_API UInputConfig_ToggleWidget : public UInputConfigBase
 {
     GENERATED_BODY()
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Config")
-    TSubclassOf<UUserWidget> WidgetClass;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Config")
-    EWidgetType WidgetType = EWidgetType::HUD;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Config")
-    bool bPlayerController;
+    TMap<TObjectPtr<UInputAction>, TSubclassOf<UUserWidget>> ToggleWidgetMap;
 
 protected:
+    virtual TArray<UInputAction*> GetInputActions() const override;
     virtual void OnTriggered_Implementation(APlayerController* PlayerController, const FInputActionInstance& InputActionInstance) override;
 };
