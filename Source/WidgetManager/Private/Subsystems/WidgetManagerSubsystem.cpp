@@ -4,6 +4,7 @@
 #include "Subsystems/WidgetManagerSubsystem.h"
 
 #include "CommonActivatableWidget.h"
+#include "Blueprint/GameViewportSubsystem.h"
 #include "Blueprint/UserWidget.h"
 #include "Interfaces/ActivatableWidgetInterface.h"
 
@@ -18,6 +19,47 @@ bool UWidgetManagerSubsystem::ShouldCreateSubsystem(UObject* Outer) const
     }
 
     return false;
+}
+
+void UWidgetManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+    Super::Initialize(Collection);
+
+    if (auto GameViewportSubsystem = GEngine->GetEngineSubsystem<UGameViewportSubsystem>())
+    {
+        GameViewportSubsystem->OnWidgetAdded.AddUObject(this, &ThisClass::OnWidgetAdded);
+        GameViewportSubsystem->OnWidgetRemoved.AddUObject(this, &ThisClass::OnWidgetRemoved);
+    }
+}
+
+void UWidgetManagerSubsystem::Deinitialize()
+{
+    if (auto GameViewportSubsystem = GEngine->GetEngineSubsystem<UGameViewportSubsystem>())
+    {
+        GameViewportSubsystem->OnWidgetAdded.RemoveAll(this);
+        GameViewportSubsystem->OnWidgetRemoved.RemoveAll(this);
+    }
+
+    Super::Deinitialize();
+}
+
+void UWidgetManagerSubsystem::OnWidgetAdded(UWidget* Widget, ULocalPlayer* LocalPlayer)
+{
+    auto UserWidget = Cast<UUserWidget>(Widget);
+    if (!UserWidget) return;
+
+    if (LocalPlayer != GetLocalPlayer()) return;
+
+    RegisterWidget(UserWidget);
+    ActivateWidget(UserWidget);
+}
+
+void UWidgetManagerSubsystem::OnWidgetRemoved(UWidget* Widget)
+{
+    auto UserWidget = Cast<UUserWidget>(Widget);
+    if (!UserWidget) return;
+
+    DeactivateWidget(UserWidget);
 }
 
 void UWidgetManagerSubsystem::ShowWidget(TSubclassOf<UUserWidget> WidgetClass)
@@ -64,7 +106,27 @@ UUserWidget* UWidgetManagerSubsystem::GetOrCreateWidget(TSubclassOf<UUserWidget>
     // 새로운 위젯 등록
     RegisterWidget(Widget);
 
+    // 새로운 위젯 활성화
+    ActivateWidget(Widget);
+
     return Widget;
+}
+
+void UWidgetManagerSubsystem::RemoveWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+    if (!WidgetClass) return;
+
+    // 등록 여부 확인
+    if (!DoesWidgetExist(WidgetClass)) return;
+
+    // 기존 위젯 가져오기
+    auto Widget = GetOrCreateWidget(WidgetClass);
+
+    // 기존 위젯 비활성화
+    DeactivateWidget(Widget);
+
+    // 기존 위젯 등록 해제
+    UnRegisterWidget(Widget);
 }
 
 void UWidgetManagerSubsystem::RegisterWidget(UUserWidget* Widget)
@@ -77,9 +139,6 @@ void UWidgetManagerSubsystem::RegisterWidget(UUserWidget* Widget)
 
     // 등록
     WidgetMap.Emplace(WidgetClass, Widget);
-
-    // 활성화
-    ActivateWidget(Widget);
 }
 
 void UWidgetManagerSubsystem::UnRegisterWidget(UUserWidget* Widget)
@@ -89,9 +148,6 @@ void UWidgetManagerSubsystem::UnRegisterWidget(UUserWidget* Widget)
     // 등록 여부 확인
     TSubclassOf<UUserWidget> WidgetClass = Widget->GetClass();
     if (!DoesWidgetExist(WidgetClass)) return;
-
-    // 비활성화
-    DeactivateWidget(Widget);
 
     // 등록 해제
     WidgetMap.Remove(WidgetClass);
