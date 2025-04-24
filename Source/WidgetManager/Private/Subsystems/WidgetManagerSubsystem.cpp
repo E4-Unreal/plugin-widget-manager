@@ -78,7 +78,7 @@ void UWidgetManagerSubsystem::ToggleWidget(TSubclassOf<UUserWidget> WidgetClass)
     if (!WidgetClass) return;
 
     auto Widget = GetOrCreateWidget(WidgetClass);
-    if (IsActive(Widget))
+    if (!IsActive(Widget))
     {
         ActivateWidget(Widget);
     }
@@ -100,9 +100,6 @@ UUserWidget* UWidgetManagerSubsystem::GetOrCreateWidget(TSubclassOf<UUserWidget>
 
     // 새로운 위젯 등록
     RegisterWidget(Widget);
-
-    // 새로운 위젯 활성화
-    ActivateWidget(Widget);
 
     return Widget;
 }
