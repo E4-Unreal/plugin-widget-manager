@@ -3,7 +3,7 @@
 
 #include "Interfaces/ActivatableWidgetInterface.h"
 
-#include "UniversalLogging.h"
+#include "Logging.h"
 
 // Add default functionality here for any IActivatableWidgetInterface functions that are not pure virtual.
 bool IActivatableWidgetInterface::IsActive_Implementation()
