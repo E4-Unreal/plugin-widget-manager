@@ -5,6 +5,7 @@
 
 #include "CommonActivatableWidget.h"
 #include "Blueprint/UserWidget.h"
+#include "Interfaces/ActivatableWidgetInterface.h"
 
 bool UWidgetManagerSubsystem::ShouldCreateSubsystem(UObject* Outer) const
 {
@@ -100,11 +101,14 @@ bool UWidgetManagerSubsystem::IsActive(UUserWidget* Widget)
 {
     if (!Widget) return false;
 
-    // TODO 인터페이스
-
+    // 활성화 여부 확인
     if (auto ActivatableWidget = Cast<UCommonActivatableWidget>(Widget))
     {
         return ActivatableWidget->IsActivated();
+    }
+    else if (Widget->Implements<UActivatableWidgetInterface>())
+    {
+        return IActivatableWidgetInterface::Execute_IsActive(Widget);
     }
     else
     {
@@ -124,12 +128,14 @@ void UWidgetManagerSubsystem::ActivateWidget(UUserWidget* Widget)
     {
         ActivatableWidget->ActivateWidget();
     }
+    else if (Widget->Implements<UActivatableWidgetInterface>())
+    {
+        IActivatableWidgetInterface::Execute_Activate(Widget);
+    }
     else if (!Widget->IsInViewport())
     {
         Widget->AddToViewport();
     }
-
-    // TODO 인터페이스
 }
 
 void UWidgetManagerSubsystem::DeactivateWidget(UUserWidget* Widget)
@@ -144,10 +150,12 @@ void UWidgetManagerSubsystem::DeactivateWidget(UUserWidget* Widget)
     {
         ActivatableWidget->DeactivateWidget();
     }
+    else if (Widget->Implements<UActivatableWidgetInterface>())
+    {
+        IActivatableWidgetInterface::Execute_Deactivate(Widget);
+    }
     else if (Widget->IsInViewport())
     {
         Widget->RemoveFromParent();
     }
-
-    // TODO 인터페이스
 }
