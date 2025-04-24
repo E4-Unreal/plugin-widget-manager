@@ -10,15 +10,10 @@
 
 bool UWidgetManagerSubsystem::ShouldCreateSubsystem(UObject* Outer) const
 {
-    if (!CastChecked<UGameInstance>(Outer)->IsDedicatedServerInstance())
-    {
-        TArray<UClass*> ChildClasses;
-        GetDerivedClasses(GetClass(), ChildClasses, false);
+    TArray<UClass*> ChildClasses;
+    GetDerivedClasses(GetClass(), ChildClasses, false);
 
-        return ChildClasses.Num() == 0;
-    }
-
-    return false;
+    return ChildClasses.Num() == 0;
 }
 
 void UWidgetManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
