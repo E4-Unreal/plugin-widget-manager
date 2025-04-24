@@ -14,7 +14,8 @@ public class WidgetManager : ModuleRules
                 "UniversalUtilities",
                 "EnhancedInputBinder",
                 "EnhancedInput",
-                "CommonInput"
+                "CommonInput",
+                "CommonUI"
             }
         );
 
