@@ -36,12 +36,13 @@ public:
     UFUNCTION(BlueprintCallable)
     virtual void ToggleWidget(TSubclassOf<UUserWidget> WidgetClass);
 
+    UFUNCTION(BlueprintCallable)
+    virtual void RemoveWidget(TSubclassOf<UUserWidget> WidgetClass);
+
 protected:
     virtual bool DoesWidgetExist(TSubclassOf<UUserWidget> WidgetClass) { return WidgetMap.Contains(WidgetClass); }
 
     virtual UUserWidget* GetOrCreateWidget(TSubclassOf<UUserWidget> WidgetClass);
-
-    virtual void RemoveWidget(TSubclassOf<UUserWidget> WidgetClass);
 
     virtual void RegisterWidget(UUserWidget* Widget);
 

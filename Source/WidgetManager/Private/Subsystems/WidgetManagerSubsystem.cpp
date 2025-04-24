@@ -88,22 +88,6 @@ void UWidgetManagerSubsystem::ToggleWidget(TSubclassOf<UUserWidget> WidgetClass)
     }
 }
 
-UUserWidget* UWidgetManagerSubsystem::GetOrCreateWidget(TSubclassOf<UUserWidget> WidgetClass)
-{
-    if (!WidgetClass) return nullptr;
-
-    // 기존 위젯 가져오기
-    if (DoesWidgetExist(WidgetClass)) return WidgetMap[WidgetClass];
-
-    // 새로운 위젯 생성
-    auto Widget = CreateWidget(GetLocalPlayer()->PlayerController, WidgetClass);
-
-    // 새로운 위젯 등록
-    RegisterWidget(Widget);
-
-    return Widget;
-}
-
 void UWidgetManagerSubsystem::RemoveWidget(TSubclassOf<UUserWidget> WidgetClass)
 {
     if (!WidgetClass) return;
@@ -119,6 +103,22 @@ void UWidgetManagerSubsystem::RemoveWidget(TSubclassOf<UUserWidget> WidgetClass)
 
     // 기존 위젯 등록 해제
     UnRegisterWidget(Widget);
+}
+
+UUserWidget* UWidgetManagerSubsystem::GetOrCreateWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+    if (!WidgetClass) return nullptr;
+
+    // 기존 위젯 가져오기
+    if (DoesWidgetExist(WidgetClass)) return WidgetMap[WidgetClass];
+
+    // 새로운 위젯 생성
+    auto Widget = CreateWidget(GetLocalPlayer()->PlayerController, WidgetClass);
+
+    // 새로운 위젯 등록
+    RegisterWidget(Widget);
+
+    return Widget;
 }
 
 void UWidgetManagerSubsystem::RegisterWidget(UUserWidget* Widget)
