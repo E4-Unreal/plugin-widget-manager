@@ -10,7 +10,12 @@ public class WidgetManager : ModuleRules
             new string[]
             {
                 "Core",
+                "UMG",
                 "UniversalUtilities",
+                "EnhancedInputBinder",
+                "EnhancedInput",
+                "CommonInput",
+                "CommonUI"
             }
         );
 

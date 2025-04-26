@@ -25,6 +25,18 @@
         {
             "Name": "UniversalUtilities",
             "Enabled": true
+        },
+        {
+            "Name": "EnhancedInputBinder",
+            "Enabled": true
+        },
+        {
+            "Name": "EnhancedInput",
+            "Enabled": true
+        },
+        {
+            "Name": "CommonUI",
+            "Enabled": true
         }
     ]
 }
