@@ -15,7 +15,8 @@ public class WidgetManager : ModuleRules
                 "EnhancedInputBinder",
                 "EnhancedInput",
                 "CommonInput",
-                "CommonUI"
+                "CommonUI",
+                "GameplayTags"
             }
         );
 
